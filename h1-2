@@ -1,0 +1,69 @@
+#ifndef TIME_H
+#define TIME_H
+
+#include <iostream>
+#include <cstddef>
+#include <string>
+#include <random>
+#include <fstream>
+#include <Windows.h>
+
+using namespace std;
+
+typedef unsigned char byte;
+
+class Time {
+public:
+    byte hours;
+    byte minutes;
+
+    // Конструктор по умолчанию
+    Time();
+
+    // Конструктор: если h < 24 и m < 60, иначе время будет 0 ч 0 м
+    Time(byte h, byte m);
+
+    // Конструктор: создание объекта по общему числу минут
+    Time(unsigned int minutes1);
+
+    // оператора ++
+    Time& operator++();
+
+    // оператора --
+    Time& operator--();
+
+    // short int (количество часов)
+    explicit operator short int() const;
+
+    // bool (true, если не 00:00)
+    explicit operator bool() const;
+
+    // добавление минут через +
+    Time operator+(unsigned int extraMinutes) const;
+
+    // вычитание минут через -
+    Time operator-(unsigned int extraMinutes) const;
+};
+
+// Вывод
+void print(const Time& t);
+
+// Проверка ввода
+bool check(string n);
+
+// Заполнение вводом из терминала
+int fillFromTerminal( std::string v);
+
+// Заполнение случайным значением
+int fillRandomly();
+
+// Заполнение из файла
+Time fillFromFile(Time& t);
+
+// Функция добавления минут
+Time AddMinutes(Time& n);
+
+// Функция вычитания минут
+Time SubMinutes(Time& n);
+
+#endif 
