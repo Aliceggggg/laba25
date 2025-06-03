@@ -1,0 +1,151 @@
+#include "time.h"
+#include <iostream>
+#include <cstddef>
+#include <string>
+#include <random>
+#include <fstream>
+#include <Windows.h>
+using namespace std;
+// Конструктор по умолчанию
+Time::Time() : hours(0), minutes(0) {}
+
+// Конструктор 2
+Time::Time(byte h, byte m) {
+    if (h < 24 and m < 60) {
+        hours = h;
+        minutes = m;
+    }
+    else {
+        hours = 0;
+        minutes = 0;
+    }
+}
+
+// Конструктор 3
+Time::Time(unsigned int minutes1) {
+    hours = (minutes1 / 60) % 24;
+    minutes = minutes1 % 60;
+}
+
+// оператор ++
+Time& Time::operator++() {
+    if (minutes < 59) {
+        *this = Time(hours, minutes + 1);
+    }
+    if (minutes == 59 and hours < 23) {
+        *this = Time(hours + 1, 0);
+    }
+    if (minutes == 59 and hours == 23) {
+        *this = Time(0, 0);
+    }
+    return *this;
+}
+
+// оператор --
+Time& Time::operator--() {
+    if (hours != 0 and minutes != 0) {
+        *this = Time(hours, minutes - 1);
+    }
+    if (hours != 0 and minutes == 0) {
+        *this = Time(hours - 1, 59);
+    }
+    if (hours == 0 and minutes == 0) {
+        *this = Time(23, 59);
+    }
+    return *this;
+}
+
+// short int
+Time::operator short int() const {
+    return hours;
+}
+
+// bool 
+Time::operator bool() const {
+    return (hours != 0 or minutes != 0);
+}
+
+// добавление минут через +
+Time Time::operator+(unsigned int extraMinutes) const {
+    return Time(hours * 60 + minutes + extraMinutes);
+}
+
+// вычитание минут через -
+Time Time::operator-(unsigned int extraMinutes) const {
+    int totalMinutes = hours * 60 + minutes;
+    while (extraMinutes > totalMinutes) {
+        extraMinutes -= totalMinutes;
+        totalMinutes = 24 * 60;
+    }
+    totalMinutes -= extraMinutes;
+    return Time(totalMinutes / 60, totalMinutes % 60);
+}
+
+// Вывод
+void print(const Time& t) {
+    cout << (int)t.hours << " ч " << (int)t.minutes << " мин" << endl;
+}
+
+// Проверка ввода
+bool check(string n) {
+    int flag = 0;
+    for (char s : n) {
+        if (isdigit(s)) {
+            flag++;
+        }
+    }
+    return (n.length() == flag and n.length() <= 9);
+}
+
+// Заполнение вводом из терминала
+int fillFromTerminal(string v) {
+    while (!check(v)) {
+        cout << "Зачем тебе столько времени, если до него не дожить? Попробуй снова: ";
+        cin >> v;
+    }
+    return stoi(v);
+}
+
+// Заполнение случайным значением
+int fillRandomly() {
+    /*srand(time(0));*/
+    return rand() % 24;
+}
+
+// Заполнение из файла
+Time fillFromFile(Time& t) {
+    ifstream file("time.txt");
+    int h, m;
+    if (file) {
+        file >> h >> m;
+        file.close();
+    }
+    t.hours = static_cast<byte>(h);
+    t.minutes = static_cast<byte>(m);
+    return t;
+}
+
+// Функция добавления минут
+Time AddMinutes(Time& n) {
+    int minut1, minut2;
+    string m1;
+    minut1 = n.hours * 60 + n.minutes;
+    //cout << minut1 << "\n";
+    cout << "Сколько минут добавить? \n(Помните, если слишком много, наступит новый день)\n";
+    cin >> m1;
+    minut2 = fillFromTerminal(m1);
+    n = n + minut2;
+    return n;
+}
+
+// Функция вычитания минут
+Time SubMinutes(Time& n) {
+    int minut1, minut2;
+    string m1;
+    minut1 = n.hours * 60 + n.minutes;
+    cout << "На сколько вернёмся в прошлое? \n(Помните, что даже слишком большое число не вернёт ваше беззаботное детство)\n";
+    cin >> m1;
+    minut2 = fillFromTerminal(m1);
+    n = n - minut2;
+    return n;
+}
