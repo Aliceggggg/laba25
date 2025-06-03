@@ -1,0 +1,112 @@
+#include "time.h"
+#include <iostream>
+#include <cstddef>
+#include <string>
+#include <random>
+#include <fstream>
+#include <Windows.h>
+using namespace std;
+
+int main() {
+    srand(time(0));
+    SetConsoleOutputCP(CP_UTF8);
+    setlocale(LC_ALL, "Russian");
+
+    int choise;
+    cout << "Выберете способ ввода. Есди он некорректен, будет запись из файла: ";
+    cout << "\n1 - Терминал\n2 - Рандомно\n3 - Из файла\n";
+    cin >> choise;
+    Time t;
+
+    switch (choise) {
+    case 1: {
+        string m1, h1;
+        cout << "Будешь вводить только минуты или отдельно часы и минуты?\n Часы и минуты - 1\n Минуты - Любое другое\n ";
+        int value;
+        cin >> value;
+        switch (value) {
+        case 1: {
+            cout << "! Предупреждение: если введешь значения часа >= 24 или минут >= 60 - время будет: 0 ч 0 м\n";
+            long long hour, minute;
+            cout << "Введи часы: ";
+            cin >> h1;
+            hour = fillFromTerminal(h1);
+            cout << "Введи минуты: ";
+            cin >> m1;
+            minute = fillFromTerminal(m1);
+            t = Time(hour, minute);
+            break;
+        }
+        default: {
+            cout << "Помните, если слишком много, наступит новый день!\n";
+            cout << "Введи минуты: ";
+            cin >> m1;
+            t = fillFromTerminal(m1);
+            break;
+        }
+        }
+        break;
+    }
+    case 2: {
+        t.hours = fillRandomly();
+        t.minutes = fillRandomly();
+        break;
+    }
+    case 3: {
+        t = fillFromFile(t);
+        break;
+    }
+    default: {
+        t = fillFromFile(t);
+        break;
+    }
+    }
+
+    print(t);
+    while (2 == 2) {
+        cout << "Ввeдите операцию:\n1: --\n2: ++\n3: Добавление минут\n4: Short int (часы)\n5: Булевая операция\n6: Вычитание минут\n7: Выход из программы";
+        cout << "\n(При некорректном вводе пройдет операция ++)\n";
+        cin >> choise;
+
+        switch (choise) {
+        case 1:
+            --t;
+            break;
+        case 2:
+            ++t;
+            break;
+        case 3:
+            AddMinutes(t);
+            break;
+        case 4: {
+            short int hoursOnly = static_cast<short int>(t);
+            cout << "Приведение к short int (только часы): " << hoursOnly << endl;
+            break;
+        }
+        case 5: {
+            bool timeStatus = static_cast<bool>(t);
+            cout << "Булевая операция: " << (timeStatus ? "true" : "false") << endl;
+            break;
+        }
+        case 6: {
+            SubMinutes(t);
+            break;
+        }
+        case 7: {
+            cout << "Выход из программы.";
+            return 0;
+        }
+        default:
+            ++t; 
+            cout << "Выход из программы.";
+            return 0;
+
+            break;
+          
+        }
+
+        cout << "\nВремя к концу программы: ";
+        print(t);
+        cout << endl;
+    }
+}
